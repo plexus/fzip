@@ -1,3 +1,5 @@
+require File.expand_path('../lib/fzip/version', __FILE__)
+
 Gem::Specification.new do |gem|
   gem.name        = 'fzip'
   gem.version     = '0.1.0'
