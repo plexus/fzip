@@ -175,37 +175,26 @@ module Fzip
     end
 
     # def prev
+    # end
 
     # Removes the node at loc, returning the loc that would have preceded
     # it in a depth-first walk.
     def remove
-      #(let [[node {lefts :lefts, parent :parent, path :path, rights :rights, :as path}] loc]
-      # (if (nil? path)
-      #   (throw (new Exception "Remove at top"))
       raise "Remove at top" unless path
-      # (if (pos? (count lefts))
       if lefts.empty?
-        # (with-meta [(make-node loc (peek path) rights)
-        #               (and parent (assoc parent :changed? true))]
-        #             (meta loc))))))
         parent.new(
           node: make_node(parent.node, rights),
           changed: true
         )
       else
-        # [loc (with-meta [(peek lefts) (assoc path :lefts (pop lefts) :changed? true)] (meta loc))]
-        loc = new(node: lefts.first, lefts: lefts.drop(1), changed: true)
-        # (loop
+        loc = new(
+          node: lefts.first,
+          lefts: lefts.drop(1),
+          changed: true
+        )
         loop do
-          # (let [child (and (branch? loc) (down loc))]
-          child = loc.branch? && loc.down
-          # (if child
-          if child
-            # (recur (rightmost child))
-            loc = child.rightmost
-          else
-            return loc
-          end
+          return loc unless child = loc.branch? && loc.down
+          loc = child.rightmost
         end
       end
     end
