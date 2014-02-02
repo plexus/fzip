@@ -56,7 +56,7 @@ module Fzip
     end
 
     def down
-      if branch? && children
+      if branch? && children.any?
         new(
           node: children.first,
           lefts: [],
@@ -72,7 +72,7 @@ module Fzip
         return parent unless changed?
         parent_path = path.drop(1)
         new(
-          node:   make_node(node, lefts + [node] + rights),
+          node:   make_node(parent.node, lefts + [node] + rights),
           lefts:  parent.lefts,
           path:   parent_path.empty? ? nil : parent_path,
           parent: parent.parent,
