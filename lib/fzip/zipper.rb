@@ -1,14 +1,22 @@
 module Fzip
   class Zipper
-    attr_reader :adapter, :parent, :path, :node, :lefts, :rights, :at_end
+    attr_reader :adapter
+    attr_reader :parent
+    attr_reader :path
+    attr_reader :node
+    attr_reader :lefts
+    attr_reader :rights
+    attr_reader :at_end
 
     def initialize(adapter, node, lefts = nil, path = nil, parent = nil, rights = nil, changed = false, at_end = false)
       @adapter   = adapter
+
       @node      = node
       @lefts     = lefts
-      @path      = path
-      @parent    = parent
       @rights    = rights
+
+      @path      = path    # Array[Node]
+      @parent    = parent  # Zipper
       @changed   = changed
       @at_end    = at_end
     end
@@ -88,7 +96,14 @@ module Fzip
       end
     end
 
-    #def rightmost
+    def rightmost
+      return self unless path && rights && !rights.empty?
+      new(
+        node: rights.last,
+        lefts: (lefts + [node] + rights)[0..-2],
+        rights: []
+      )
+    end
 
     def left
       if path && lefts && !lefts.empty?
@@ -100,7 +115,14 @@ module Fzip
       end
     end
 
-    # def leftmost
+    def leftmost
+      return self unless path && lefts && !lefts.empty?
+      new(
+        node: lefts.first,
+        lefts: [],
+        rights: (lefts + [node] + rights).drop(1)
+      )
+    end
 
     def insert_left(item)
       raise "insert at top" unless path
@@ -154,7 +176,39 @@ module Fzip
 
     # def prev
 
-    # def remove
+    # Removes the node at loc, returning the loc that would have preceded
+    # it in a depth-first walk.
+    def remove
+      #(let [[node {lefts :lefts, parent :parent, path :path, rights :rights, :as path}] loc]
+      # (if (nil? path)
+      #   (throw (new Exception "Remove at top"))
+      raise "Remove at top" unless path
+      # (if (pos? (count lefts))
+      if lefts.empty?
+        # (with-meta [(make-node loc (peek path) rights)
+        #               (and parent (assoc parent :changed? true))]
+        #             (meta loc))))))
+        parent.new(
+          node: make_node(parent.node, rights),
+          changed: true
+        )
+      else
+        # [loc (with-meta [(peek lefts) (assoc path :lefts (pop lefts) :changed? true)] (meta loc))]
+        loc = new(node: lefts.first, lefts: lefts.drop(1), changed: true)
+        # (loop
+        loop do
+          # (let [child (and (branch? loc) (down loc))]
+          child = loc.branch? && loc.down
+          # (if child
+          if child
+            # (recur (rightmost child))
+            loc = child.rightmost
+          else
+            return loc
+          end
+        end
+      end
+    end
 
     def each
       return to_enum unless block_given?
@@ -165,3 +219,8 @@ module Fzip
     end
   end
 end
+
+# Notes on the port from zip.clj :
+# Gave these variables a different name
+#   pnodes => path
+#   ppath  => parent
