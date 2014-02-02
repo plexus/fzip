@@ -2,7 +2,7 @@ require File.expand_path('../lib/fzip/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name        = 'fzip'
-  gem.version     = '0.1.0'
+  gem.version     = Fzip::VERSION
   gem.authors     = [ 'Arne Brasseur' ]
   gem.email       = [ 'arne@arnebrasseur.net' ]
   gem.description = 'Functional zipper class'
