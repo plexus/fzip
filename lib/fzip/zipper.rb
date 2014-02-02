@@ -174,8 +174,16 @@ module Fzip
         backtrack.(self)
     end
 
-    # def prev
-    # end
+    def prev
+      return up unless loc = left
+      loop do
+        if child = loc.branch? && loc.down
+          loc = child.rightmost
+        else
+          return loc
+        end
+      end
+    end
 
     # Removes the node at loc, returning the loc that would have preceded
     # it in a depth-first walk.
